@@ -1,25 +1,36 @@
 import * as fs from 'fs';
-import { Database } from "@journeyapps/sqlcipher";
+import * as sqlite3 from 'better-sqlite3-multiple-ciphers';
+
+interface DbConversation {
+  id: string,
+  json: string,
+  active_at: number,
+  type: string,
+  members: any | null,
+  name: string | null,
+  profileName: string | null,
+  profileFamilyName: string | null
+  profileFullName: string,
+  e164: string,
+  serviceId: string,
+  groupId: string | null,
+  profileLastFetchedAt: number
+}
 
 // FIXME
 const config = JSON.parse(fs.readFileSync('./instance/config.json').toString());
 
-const db = new Database('./instance/db.sqlite');
+const db = sqlite3('./instance/db.sqlite');
 
-db.serialize(() => {
-  db.run("PRAGMA cipher_compatibility = 4");
-  db.run(`PRAGMA key = "x'${config['key']}'"`);
+db.pragma(`cipher='sqlcipher'`);
+db.pragma(`legacy=4`);
+db.pragma(`key="x'${config['key']}'"`);
 
-  db.each("SELECT * from conversations", (err, row) => {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    if (!row.members) {
-      return;
-    }
-    console.log(`${row.id}: ${row.name}`);
-  });
-});
-
-db.close();
+const stmnt = db.prepare('SELECT * FROM conversations');
+const iter = stmnt.iterate();
+let result = iter.next();
+while (!result.done) {
+  const conversation = result.value as DbConversation;
+  console.log(`${conversation.id}: ${conversation.name}`);
+  result = iter.next();
+}

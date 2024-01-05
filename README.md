@@ -18,6 +18,8 @@ npm run start
 ```
 
 ## Accessing messages manually
+> **BROKEN as of 2024**: Recent updates to the Signal database have made it so you can no longer browse it via DB Browser. A future update may address this, but maybe not! Leaving the instructions below for reference.
+
 This allows you to view the structure of your Signal database and browse the contents of its tables. Some SQL knowledge is useful to make sense of what you're looking at.
 
 Source: https://www.reddit.com/r/signal/comments/irbxii/comment/hgq21yf/?utm_source=reddit&utm_medium=web2x&context=3
